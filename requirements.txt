@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+sentence-transformers
+faiss-cpu
+pdfminer.six
+groq
+google-api-python-client
+python-multipart
+chainlit
+requests
