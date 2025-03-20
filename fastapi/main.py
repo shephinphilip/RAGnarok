@@ -76,10 +76,20 @@ def retrieve_passages(query, k=5):
 
 # Function to perform web search using Google Custom Search API
 def web_search(query, num_results=3):
-    service = build("customsearch", "v1", developerKey=google_api_key)
-    res = service.cse().list(q=query, cx=google_cse_id, num=num_results).execute()
-    snippets = [item['snippet'] for item in res.get('items', [])]
-    return snippets
+    try:
+        service = build("customsearch", "v1", developerKey=google_api_key)
+        res = service.cse().list(q=query, cx=google_cse_id, num=num_results).execute()
+
+        if 'items' not in res:
+            print(f"Google Search API returned no results for: {query}")
+            return ["No search results found."]
+
+        snippets = [item['snippet'] for item in res.get('items', [])]
+        return snippets
+    except Exception as e:
+        print(f"Error in web_search(): {str(e)}")
+        return ["Search API failed."]
+
 
 # Pydantic model for chat request
 class ChatRequest(BaseModel):
@@ -114,12 +124,23 @@ async def chat(request: ChatRequest):
     # Remove duplicates
     all_passages = list(set(all_passages))
     
-    # If insufficient passages, perform web search
+    # If the knowledge base does not have enough relevant data, trigger web search
     if len(all_passages) < 2:
+        print("🔎 No relevant passages found in KB. Triggering web search...")
         web_snippets = web_search(query, num_results=3)
+        
+        if not web_snippets or "No search results found." in web_snippets:
+            print("❌ Web search failed. No results found.")
+            return {"answer": "I couldn't find the answer in the knowledge base or online."}
+        
         all_passages.extend(web_snippets)
-    
-    # Generate response using retrieved passages
+        print(f"✅ Web search results retrieved: {web_snippets}")
+
+    # If no results are available at all, return a proper message
+    if not all_passages:
+        return {"answer": "I couldn't find any relevant information in the knowledge base or on the web."}
+
+    # Generate response using retrieved information
     passages_text = "\n".join(all_passages)
     prompt = f"Based on the following information, answer the question: {query}\n\nInformation:\n{passages_text}"
     response = groq_client.chat.completions.create(
@@ -127,8 +148,10 @@ async def chat(request: ChatRequest):
         model="mixtral-8x7b-32768",
         max_tokens=500
     )
+
     answer = response.choices[0].message.content.strip()
     return {"answer": answer}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
