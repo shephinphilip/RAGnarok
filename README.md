@@ -1,8 +1,7 @@
 # RAGnarok
-# DocuQuest
 
 ## Overview
-DocuQuest is a Retrieval-Augmented Generation (RAG) chatbot that allows users to upload PDFs, build a knowledge base (KB), and ask questions or discuss topics based on the uploaded content. If the required information isn’t found in the KB, it performs a web search to augment its responses. Built from scratch without external frameworks like LangChain or LlamaIndex, it uses open-source tools, Groq for the language model (LLM), FastAPI for APIs, and Chainlit for the chat interface. The entire application is containerized with Docker for easy deployment.
+RAGnarok is a Retrieval-Augmented Generation (RAG) chatbot that allows users to upload PDFs, build a knowledge base (KB), and ask questions or discuss topics based on the uploaded content. If the required information isn’t found in the KB, it performs a web search to augment its responses. Built from scratch without external frameworks like LangChain or LlamaIndex, it uses open-source tools, Groq for the language model (LLM), FastAPI for APIs, and Chainlit for the chat interface. The entire application is containerized with Docker for easy deployment.
 
 ## Features
 - **PDF Processing:** Upload one or more PDFs to extract text and create a searchable knowledge base.
@@ -64,7 +63,7 @@ The application is split into two main components:
 ### 1. Clone the Repository
 ```bash
 git clone <repository-url>
-cd docuquest
+cd RAGnarok
 ```
 
 ### 2. Configure Environment Variables
@@ -107,7 +106,7 @@ docker-compose up --build
 
 ## Project Structure
 ```plaintext
-docuquest/
+RAGnarok/
 ├── fastapi/
 │   ├── main.py           # FastAPI backend logic
 │   ├── Dockerfile        # Dockerfile for backend
@@ -146,6 +145,3 @@ docuquest/
 
 ## Contributing
 Feel free to fork this repository, submit issues, or send pull requests to enhance functionality (e.g., adding persistent storage, improving decomposition logic).
-
-## License
-This project is open-source under the MIT License.
